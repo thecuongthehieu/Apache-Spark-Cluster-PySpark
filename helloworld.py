@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
-
+import logging
+import sys
 
 def main():
     # Initialize SparkSession
@@ -8,13 +9,27 @@ def main():
         .master("spark://localhost:7077") \
         .getOrCreate()
 
-    # Create an RDD containing numbers from 1 to 1000
+    # Get Spark logger
+    # sc = spark.sparkContext
+    # sc.setLogLevel("WARN")
+    # logger = sc._jvm.org.apache.log4j.LogManager.getRootLogger()
+
+    def log_data(x):
+        logging.basicConfig(level=logging.INFO)
+        logger = logging.getLogger()
+        logger.info(f"Processing {x}")
+        # print(f"Processing {x}")
+
+    # Create an RDD containing numbers [1, 1000000000)
     numbers_rdd = spark.sparkContext.parallelize(range(1, 1000))
+
+    numbers_rdd.foreach(log_data)
 
     # Count the elements in the RDD
     count = numbers_rdd.count()
 
-    print(f"Count of numbers from 1 to 1000 is: {count}")
+    # logger.error(f"Count of numbers in [1, 1000000000) is: {count}")
+    print(f"Count of numbers in [1, 1000000000) is: {count}")
 
     # Stop the SparkSession
     spark.stop()
